@@ -145,7 +145,6 @@ public class FileProperties implements Cborable {
         state.put("m", new CborObject.CborString(mimeType));
         state.put("s", new CborObject.CborLong(size));
         state.put("t", new CborObject.CborLong(modified.toEpochSecond(ZoneOffset.UTC)));
-
         state.put("c", new CborObject.CborLong(created.toEpochSecond(ZoneOffset.UTC)));
         state.put("h", new CborObject.CborBoolean(isHidden));
         thumbnail.ifPresent(thumb -> state.put("i", new CborObject.CborByteArray(thumb.data)));
