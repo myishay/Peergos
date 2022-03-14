@@ -146,18 +146,12 @@ public class FileProperties implements Cborable {
         state.put("s", new CborObject.CborLong(size));
         state.put("t", new CborObject.CborLong(modified.toEpochSecond(ZoneOffset.UTC)));
 
-        //kev state.put("c", new CborObject.CborString("" + created.toEpochSecond(ZoneOffset.UTC)));
         state.put("c", new CborObject.CborLong(created.toEpochSecond(ZoneOffset.UTC)));
         state.put("h", new CborObject.CborBoolean(isHidden));
         thumbnail.ifPresent(thumb -> state.put("i", new CborObject.CborByteArray(thumb.data)));
         thumbnail.ifPresent(thumb -> state.put("im", new CborObject.CborString(thumb.mimeType)));
         streamSecret.ifPresent(secret -> state.put("p", new CborObject.CborByteArray(secret)));
-        CborObject obj = CborObject.CborMap.build(state);
-        byte[] bytes = obj.toByteArray();
-        if (name.equals("somedata.bin")) {
-            System.out.println("KEV name=" + name + " len=" + bytes.length);
-        }
-        return obj;
+        return CborObject.CborMap.build(state);
     }
 
     @SuppressWarnings("unusable-by-js")
@@ -172,8 +166,6 @@ public class FileProperties implements Cborable {
         long size = m.getLong("s");
         long modifiedEpochMillis = m.getLong("t");
         long createdEpochMillis = m.getLong("c");
-        //kev Optional<String> optionalCreatedEpochMillis = m.getOptionalString("c");
-        //kev long createdEpochMillis = optionalCreatedEpochMillis.map(c -> Long.parseLong(c)).orElse(modifiedEpochMillis);
         boolean isHidden = m.getBoolean("h");
         Optional<byte[]> thumbnailData = m.getOptionalByteArray("i");
         Optional<Thumbnail> thumbnail = thumbnailData.map(d -> new Thumbnail(m.getString("im", "image/png"), d));
@@ -181,13 +173,7 @@ public class FileProperties implements Cborable {
 
         LocalDateTime modified = LocalDateTime.ofEpochSecond(modifiedEpochMillis, 0, ZoneOffset.UTC);
         LocalDateTime created = LocalDateTime.ofEpochSecond(createdEpochMillis, 0, ZoneOffset.UTC);
-        FileProperties fp = new FileProperties(name, isDirectory, isLink, mimeType, size, modified, created, isHidden, thumbnail, streamSecret);
-        CborObject cborObj2 = fp.toCbor();
-        byte[] bytes = cborObj2.toByteArray();
-        if (name.equals("somedata.bin")) {
-            System.out.println("KEV name=" + name + " len=" + bytes.length);
-        }
-        return fp;
+        return new FileProperties(name, isDirectory, isLink, mimeType, size, modified, created, isHidden, thumbnail, streamSecret);
     }
 
     @JsIgnore
